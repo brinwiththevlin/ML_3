@@ -1,10 +1,17 @@
 import pandas as pd
+import numpy as np
+import plotly
 import plotly.express as px
+import plotly.graph_objects as go
+from typing import List
+
+plotly.io.renderers.default = "browser"
+
 def accuracy(y_true: pd.Series, y_pred: pd.Series) -> float:
     """returns the accuracy of the model
 
     Args:
-        y_true (pd.Series): treu lables
+        y_true (pd.Series): true labels
         y_pred (pd.Series): predicted labels
 
     Returns:
@@ -14,8 +21,25 @@ def accuracy(y_true: pd.Series, y_pred: pd.Series) -> float:
     TN =  ((y_true == 0) & (y_pred == 0)).sum()
     return TP+TN/len(y_true)*100
     
-def accuracy_plot(): 
-    pass
+def accuracy_plot(accuracies: np.ndarray, model: str ): 
+    """creates accuracy plot against bin size
+
+    Args:
+        accuracies (np.ndarray): each row corresponds to one of 5 splits, each column is the bin size
+        model (str): name of the model being analyzed
+    """
+    bins = [5,10,15,20]
+    trace1 = go.Scatter(x=bins, y=accuracies[:,0], mode='lines', name='Line 1')
+    trace2 = go.Scatter(x=bins, y=accuracies[:,1], mode='lines', name='Line 2')
+    trace3 = go.Scatter(x=bins, y=accuracies[:,2], mode='lines', name='Line 3')
+    trace4 = go.Scatter(x=bins, y=accuracies[:,3], mode='lines', name='Line 4')
+    trace5 = go.Scatter(x=bins, y=accuracies[:,4], mode='lines', name='Line 5')
+    traces = [trace1, trace2, trace3, trace4, trace5]
+    
+    layout = go.Layout(title=f'accuracy against bin size for {model}', xaxis=dict(title='bin size'), yaxis=dict(title='accuracy'))
+    
+    fig = go.Figure(data=traces, layout=layout)
+    fig.show()
 
 
 def F1(y_true: pd.Series, y_pred: pd.Series) -> float:
