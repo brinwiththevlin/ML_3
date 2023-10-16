@@ -27,7 +27,7 @@ if __name__ == "__main__":
 
     for i in range(5):
         Xtrain, Xtest, Ytrain, Ytest = train_test_split(
-            iris_df.drop(["target"]),
+            iris_df.drop(columns=["target"]),
             iris_df["target"],
             test_size=0.33,
             random_state=states[i],
