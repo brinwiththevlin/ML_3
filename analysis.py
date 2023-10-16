@@ -21,7 +21,7 @@ def accuracy(y_true: pd.Series, y_pred: pd.Series) -> float:
     TN =  ((y_true == 0) & (y_pred == 0)).sum()
     return TP+TN/len(y_true)*100
     
-def accuracy_plot(accuracies: np.ndarray, model: str ): 
+def accuracy_plot(accuracies: np.ndarray, model: str )->None: 
     """creates accuracy plot against bin size
 
     Args:
@@ -29,11 +29,11 @@ def accuracy_plot(accuracies: np.ndarray, model: str ):
         model (str): name of the model being analyzed
     """
     bins = [5,10,15,20]
-    trace1 = go.Scatter(x=bins, y=accuracies[:,0], mode='lines', name='Line 1')
-    trace2 = go.Scatter(x=bins, y=accuracies[:,1], mode='lines', name='Line 2')
-    trace3 = go.Scatter(x=bins, y=accuracies[:,2], mode='lines', name='Line 3')
-    trace4 = go.Scatter(x=bins, y=accuracies[:,3], mode='lines', name='Line 4')
-    trace5 = go.Scatter(x=bins, y=accuracies[:,4], mode='lines', name='Line 5')
+    trace1 = go.Scatter(x=bins, y=accuracies[:,0], mode='lines', name='split 1')
+    trace2 = go.Scatter(x=bins, y=accuracies[:,1], mode='lines', name='split 2')
+    trace3 = go.Scatter(x=bins, y=accuracies[:,2], mode='lines', name='split 3')
+    trace4 = go.Scatter(x=bins, y=accuracies[:,3], mode='lines', name='split 4')
+    trace5 = go.Scatter(x=bins, y=accuracies[:,4], mode='lines', name='split 5')
     traces = [trace1, trace2, trace3, trace4, trace5]
     
     layout = go.Layout(title=f'accuracy against bin size for {model}', xaxis=dict(title='bin size'), yaxis=dict(title='accuracy'))
@@ -63,12 +63,28 @@ def F1(y_true: pd.Series, y_pred: pd.Series) -> float:
     return f1
 
 
+def F1_plot(F1_scores: np.ndarray, model: str)->None:
+    """creates F1 score plot against bin size
 
-#TODO: decide what the input should look like
-def F1_plot():
+    Args:
+        F1_scores (np.ndarray): each row corresponds to one of 5 splits, each column is the bin size
+        model (str): name of the model being analyzed
+    """
+    bins = [5,10,15,20]
+    trace1 = go.Scatter(x=bins, y=F1_scores[:,0], mode='lines', name='split 1')
+    trace2 = go.Scatter(x=bins, y=F1_scores[:,1], mode='lines', name='split 2')
+    trace3 = go.Scatter(x=bins, y=F1_scores[:,2], mode='lines', name='split 3')
+    trace4 = go.Scatter(x=bins, y=F1_scores[:,3], mode='lines', name='split 4')
+    trace5 = go.Scatter(x=bins, y=F1_scores[:,4], mode='lines', name='split 5')
+    traces = [trace1, trace2, trace3, trace4, trace5]
+    
+    layout = go.Layout(title=f'F1 against bin size for {model}', xaxis=dict(title='bin size'), yaxis=dict(title='F1'))
+    
+    fig = go.Figure(data=traces, layout=layout)
+    fig.show()
     pass
 
-# def 
 
 def ROC_plot():
+    # for classifiers that only give labels the "curve" will only be one point
     pass
