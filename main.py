@@ -39,4 +39,4 @@ if __name__ == "__main__":
                 random_state=states[i],
             )
 
-            model = dt.id3(Xtrain, Ytrain)
+            model = dt.id3(Xtrain, Ytrain, list(Xtrain.columns))
