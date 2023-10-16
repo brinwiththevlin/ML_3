@@ -1,6 +1,7 @@
 import decision_trees as dt
 import naive_bayes as nb
 import analysis
+from utils import discretize
 from sklearn import datasets
 from sklearn.model_selection import train_test_split
 import pandas as pd
@@ -22,13 +23,20 @@ if __name__ == "__main__":
 
     states = [random.randint(10, 50) for __ in range(5)]
     ######################################
+    # ------------ binning  ------------ #
+    ######################################
+    binned_data = [discretize(iris_df, bin) for bin in bins]
+
+    ######################################
     # ---------- ID3 training ---------- #
     ######################################
+    for data in binned_data:
+        for i in range(5):
+            Xtrain, Xtest, Ytrain, Ytest = train_test_split(
+                data.drop(["target"]),
+                data["target"],
+                test_size=0.33,
+                random_state=states[i],
+            )
 
-    for i in range(5):
-        Xtrain, Xtest, Ytrain, Ytest = train_test_split(
-            iris_df.drop(["target"]),
-            iris_df["target"],
-            test_size=0.33,
-            random_state=states[i],
-        )
+            model = dt.id3(Xtrain, Ytrain)
