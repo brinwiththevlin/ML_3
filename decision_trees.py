@@ -1,5 +1,5 @@
 import pandas as pd
-from typing import List
+from typing import Set
 from utils import IG
 
 
@@ -18,22 +18,27 @@ class treeNode:
 
     def is_leaf(self):
         return not bool(self.branches)
+    
+    def predict(self, x: pd.Series):
+        if self.is_leaf():
+            return self.classification
+        return self.branches[x[self.attribute]].predict(x)
 
 
-def id3(Xtrain: pd.DataFrame, Ytrain: pd.DataFrame, attributes: List[str]) -> treeNode:
+def id3(Xtrain: pd.DataFrame, Ytrain: pd.DataFrame, attributes: Set[str]) -> treeNode:
     root = treeNode()
 
-    if len(Ytrain.values) == 1:
-        root.classification = Ytrain.values[0]
+    if len(Ytrain.unique()) == 1:
+        root.classification = Ytrain.unique()[0]
         return root
     if len(attributes) == 0:
         root.classification = Ytrain.value_counts().idxmax()
 
-    gains = [IG(Xtrain, Ytrain, a) for a in attributes]
-    A = attributes[gains.index(max(gains))]  # A is attribute with greatest gain
+    gains = {a:IG(Xtrain, Ytrain, a) for a in attributes}
+    A = max(gains)  # A is attribute with greatest gain
     root.attribute = A
 
-    for v in Xtrain[A].values:
+    for v in Xtrain[A].unique():
         Xtrain_v = Xtrain[Xtrain[A] == v]
         Ytrain_v = Ytrain.loc[Xtrain[Xtrain[A] == v].index]
 
@@ -41,6 +46,6 @@ def id3(Xtrain: pd.DataFrame, Ytrain: pd.DataFrame, attributes: List[str]) -> tr
             common = Ytrain.value_counts().idxmax()
             root.add_branch(v, treeNode(classification=common))
         else:
-            root.add_branch(v, id3(Xtrain_v, Ytrain_v, attributes.remove(A)))
+            root.add_branch(v, id3(Xtrain_v, Ytrain_v, attributes - set([A])))
 
     return root

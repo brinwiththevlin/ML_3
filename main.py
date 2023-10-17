@@ -7,6 +7,7 @@ from sklearn.model_selection import train_test_split
 import pandas as pd
 import numpy as np
 import random
+from typing import Tuple
 
 
 if __name__ == "__main__":
@@ -18,10 +19,10 @@ if __name__ == "__main__":
     iris_df["target"] = (data.target == 0).astype(int)
 
     bins = [5, 10, 15, 20]
-    accuracies = np.zeros(shape=(4, 5))
-    F1_score = np.zeros(shape=(4, 5))
+    accuracies = np.zeros(shape=(4, 5), dtype=float)
+    F1_scores = np.zeros(shape=(4, 5), dtype=float)
 
-    states = [random.randint(10, 50) for __ in range(5)]
+    states = [random.randint(10, 100) for __ in range(5)]
     ######################################
     # ------------ binning  ------------ #
     ######################################
@@ -30,13 +31,24 @@ if __name__ == "__main__":
     ######################################
     # ---------- ID3 training ---------- #
     ######################################
-    for data in binned_data:
-        for i in range(5):
+    
+    for i, data in enumerate(binned_data):
+        for j in range(5):
             Xtrain, Xtest, Ytrain, Ytest = train_test_split(
-                data.drop(["target"]),
+                data.drop(columns=["target"]),
                 data["target"],
                 test_size=0.33,
-                random_state=states[i],
+                random_state=states[j],
             )
 
-            model = dt.id3(Xtrain, Ytrain, list(Xtrain.columns))
+            model = dt.id3(Xtrain, Ytrain, set(Xtrain.columns))
+            Ypred = pd.Series([model.predict(x) for _, x in Xtest.iterrows()],index=Ytest.index)
+            accuracies[i,j] = analysis.accuracy(Ytest, Ypred)
+            F1_scores[i,j] = analysis.F1(Ytest, Ypred)
+            
+    analysis.accuracy_plot(accuracies=accuracies, model='ID3')
+    analysis.F1_plot(F1_scores=F1_scores, model='ID3')
+        
+            
+    print(accuracies)
+    print(F1_scores)

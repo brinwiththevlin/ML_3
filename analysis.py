@@ -31,11 +31,11 @@ def accuracy_plot(accuracies: np.ndarray, model: str) -> None:
         model (str): name of the model being analyzed
     """
     bins = [5, 10, 15, 20]
-    trace1 = go.Scatter(x=bins, y=accuracies[:, 0], mode="lines", name="split 1")
-    trace2 = go.Scatter(x=bins, y=accuracies[:, 1], mode="lines", name="split 2")
-    trace3 = go.Scatter(x=bins, y=accuracies[:, 2], mode="lines", name="split 3")
-    trace4 = go.Scatter(x=bins, y=accuracies[:, 3], mode="lines", name="split 4")
-    trace5 = go.Scatter(x=bins, y=accuracies[:, 4], mode="lines", name="split 5")
+    trace1 = go.Scatter(x=bins, y=accuracies[:, 0], mode="lines", name="split 1", line=dict(dash='longdashdot'))
+    trace2 = go.Scatter(x=bins, y=accuracies[:, 1], mode="lines", name="split 2", line=dict(dash='dash'))
+    trace3 = go.Scatter(x=bins, y=accuracies[:, 2], mode="lines", name="split 3", line=dict(dash='dashdot'))
+    trace4 = go.Scatter(x=bins, y=accuracies[:, 3], mode="lines", name="split 4", line=dict(dash='longdash'))
+    trace5 = go.Scatter(x=bins, y=accuracies[:, 4], mode="lines", name="split 5", line=dict(dash='dot'))
     traces = [trace1, trace2, trace3, trace4, trace5]
 
     layout = go.Layout(
