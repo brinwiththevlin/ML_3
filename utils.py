@@ -37,7 +37,7 @@ def H(data: pd.DataFrame, target: pd.DataFrame) -> float:
     """
     p0 = target.value_counts()[0] if 0 in target.value_counts() else 0
     p1 = target.value_counts()[1] if 1 in target.value_counts() else 0
-    return -(p0 * math.log2(p0) + p1 * math.log2(p1)) if p0 !=0 and p1 != 0 else 0
+    return -(p0 * math.log2(p0) + p1 * math.log2(p1)) if p0 != 0 and p1 != 0 else 0
 
 
 def discretize(df: pd.DataFrame, bins: int) -> pd.DataFrame:

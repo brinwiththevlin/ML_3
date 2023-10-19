@@ -18,7 +18,7 @@ class treeNode:
 
     def is_leaf(self):
         return not bool(self.branches)
-    
+
     def predict(self, x: pd.Series):
         if self.is_leaf():
             return self.classification
@@ -26,6 +26,16 @@ class treeNode:
 
 
 def id3(Xtrain: pd.DataFrame, Ytrain: pd.DataFrame, attributes: Set[str]) -> treeNode:
+    """generates a decision tree for binary classification
+
+    Args:
+        Xtrain (pd.DataFrame): training data
+        Ytrain (pd.DataFrame): training lables
+        attributes (Set[str]): list of attribute names
+
+    Returns:
+        treeNode: decision tree for binary classification
+    """
     root = treeNode()
 
     if len(Ytrain.unique()) == 1:
@@ -34,7 +44,7 @@ def id3(Xtrain: pd.DataFrame, Ytrain: pd.DataFrame, attributes: Set[str]) -> tre
     if len(attributes) == 0:
         root.classification = Ytrain.value_counts().idxmax()
 
-    gains = {a:IG(Xtrain, Ytrain, a) for a in attributes}
+    gains = {a: IG(Xtrain, Ytrain, a) for a in attributes}
     A = max(gains)  # A is attribute with greatest gain
     root.attribute = A
 

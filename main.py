@@ -31,7 +31,7 @@ if __name__ == "__main__":
     ######################################
     # ---------- ID3 training ---------- #
     ######################################
-    
+
     for i, data in enumerate(binned_data):
         for j in range(5):
             Xtrain, Xtest, Ytrain, Ytest = train_test_split(
@@ -42,13 +42,12 @@ if __name__ == "__main__":
             )
 
             model = dt.id3(Xtrain, Ytrain, set(Xtrain.columns))
-            Ypred = pd.Series([model.predict(x) for _, x in Xtest.iterrows()],index=Ytest.index)
-            accuracies[i,j] = analysis.accuracy(Ytest, Ypred)
-            F1_scores[i,j] = analysis.F1(Ytest, Ypred)
-            
-    analysis.accuracy_plot(accuracies=accuracies, model='ID3')
-    analysis.F1_plot(F1_scores=F1_scores, model='ID3')
-        
-            
-    print(accuracies)
-    print(F1_scores)
+            Ypred = pd.Series(
+                [model.predict(x) for _, x in Xtest.iterrows()], index=Ytest.index
+            )
+            accuracies[i, j] = analysis.accuracy(Ytest, Ypred)
+            F1_scores[i, j] = analysis.F1(Ytest, Ypred)
+
+    analysis.print_accuracy(accuracies, bins=bins)
+    analysis.accuracy_plot(accuracies=accuracies, model="ID3")
+    analysis.F1_plot(F1_scores=F1_scores, model="ID3")
