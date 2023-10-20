@@ -32,7 +32,18 @@ if __name__ == "__main__":
     # ---------- ID3 training ---------- #
     ######################################
     
+    Xtrain, Xtest, Ytrain, Ytest = train_test_split(
+                binned_data[0].drop(columns=["target"]),
+                binned_data[0]["target"],
+                test_size=0.33,
+                random_state=states[1],
+            )
+    
+    nb.naive_bayes(Xtrain=Xtrain, Ytrain=Ytrain,attributes=list(Xtrain.columns), bins =5)
+    
+    '''
     for i, data in enumerate(binned_data):
+    
         for j in range(5):
             Xtrain, Xtest, Ytrain, Ytest = train_test_split(
                 data.drop(columns=["target"]),
@@ -40,6 +51,8 @@ if __name__ == "__main__":
                 test_size=0.33,
                 random_state=states[j],
             )
+            print("dfkgdfg")
+            print(Xtrain, Xtest, Ytrain, Ytest)
 
             model = dt.id3(Xtrain, Ytrain, set(Xtrain.columns))
             Ypred = pd.Series([model.predict(x) for _, x in Xtest.iterrows()],index=Ytest.index)
@@ -52,3 +65,5 @@ if __name__ == "__main__":
             
     print(accuracies)
     print(F1_scores)
+    */
+    '''
