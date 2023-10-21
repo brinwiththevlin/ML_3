@@ -55,7 +55,8 @@ def discretize(df: pd.DataFrame, bins: int) -> pd.DataFrame:
             continue
         edges = np.histogram_bin_edges(df[feature], bins)
         means = {i: (edges[i] + edges[i + 1]) / 2 for i in range(len(edges) - 1)}
-        indexes = np.digitize(df[feature], edges[1:-1])
+        edges[0] -= 0.2
+        indexes = np.digitize(df[feature], edges, right=True) - 1
         new_values = [means[i] for i in indexes]
         df[feature] = new_values
 

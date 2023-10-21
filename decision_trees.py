@@ -12,6 +12,7 @@ class treeNode:
         self.branches = (
             branches if branches is not None else {}
         )  # Dictionary to store child nodes
+        self.default_classification = None
 
     def add_branch(self, value, child_node):
         self.branches[value] = child_node
@@ -22,7 +23,10 @@ class treeNode:
     def predict(self, x: pd.Series):
         if self.is_leaf():
             return self.classification
-        return self.branches[x[self.attribute]].predict(x)
+        try:
+            return self.branches[x[self.attribute]].predict(x)
+        except:
+            return self.default_classification
 
 
 def id3(Xtrain: pd.DataFrame, Ytrain: pd.DataFrame, attributes: Set[str]) -> treeNode:
@@ -37,12 +41,13 @@ def id3(Xtrain: pd.DataFrame, Ytrain: pd.DataFrame, attributes: Set[str]) -> tre
         treeNode: decision tree for binary classification
     """
     root = treeNode()
+    root.default_classification = root.classification = Ytrain.value_counts().idxmax()
 
     if len(Ytrain.unique()) == 1:
         root.classification = Ytrain.unique()[0]
         return root
     if len(attributes) == 0:
-        root.classification = Ytrain.value_counts().idxmax()
+        root.classification = root.default_classification
 
     gains = {a: IG(Xtrain, Ytrain, a) for a in attributes}
     A = max(gains)  # A is attribute with greatest gain

@@ -26,7 +26,7 @@ if __name__ == "__main__":
     ######################################
     # ------------ binning  ------------ #
     ######################################
-    binned_data = [discretize(iris_df, bin) for bin in bins]
+    binned_data = [discretize(iris_df.copy(), bin) for bin in bins]
 
     ######################################
     # ---------- ID3 training ---------- #
