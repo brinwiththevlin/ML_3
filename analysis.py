@@ -18,6 +18,7 @@ def accuracy(y_true: pd.Series, y_pred: pd.Series) -> float:
     Returns:
         float: accuracy [0-100]
     """
+
     TP = ((y_true == 1) & (y_pred == 1)).sum()
     TN = ((y_true == 0) & (y_pred == 0)).sum()
     return TP + TN / len(y_true) * 100

@@ -1,10 +1,54 @@
 import pandas as pd
 import json
 
+def predict (Xtest, Ytest, prob_dict):
+    c0 = prob_dict["c0"]
+    c1 = prob_dict["c1"]
+    c0_features= prob_dict["c0_features"]
+    c1_features = prob_dict["c1_features"]
+    result_list = []
+    
+    for item in Xtest.iterrows():
+        point = item[1].to_dict()
+        
+        numerator0 = 1
+        numerator1 = 1
+        
+        for attribute in point:
+            
+            numerator0 *= c0_features[attribute][point[attribute]]
+            numerator1 *= c1_features[attribute][point[attribute]]
+        numerator1 *= c1
+        numerator0 *= c0
+        if(numerator0>numerator1):
+            result_list.append(0)
+        else:
+            result_list.append(1)
+    Ypred = pd.Series(result_list, index=Ytest.index)
+    
+    return Ypred
+            
+    '''
+    testx = Xtest.iloc[0].to_dict()
+    mult0 = 1
+    mult1 = 1
+    for a in testx:
+        mult0 *= c0_features[a][testx[a]]
+        mult1 *= c1_features[a][testx[a]]
+
+    mult0 *= c0
+    mult1 *= c1
+    
+    if(mult0>mult1):
+        return 0
+    else:
+        return 1
+    '''
+
 def get_feature_probs(data, Xtrain, attributes, bins):
     class0_probs = dict()
     class1_probs = dict()
-    alpha = 100
+    alpha = 10
     train_len = Xtrain.shape[0]
     
     print(train_len)
@@ -38,13 +82,20 @@ def prob_features_given_class(class_probs: pd.DataFrame):
 def naive_bayes( Xtrain: pd.DataFrame, Ytrain: pd.DataFrame, attributes, bins:int):
     train_len = Ytrain.shape[0]
     value_counts = Ytrain.value_counts()
+    data = pd.concat([Xtrain, Ytrain], axis=1)
+    
+    prob_dict = dict()
     p_0 = value_counts[0]/train_len
     p_1 = value_counts[1]/train_len
+    prob_dict["c0"] = p_0
+    prob_dict["c1"] = p_1
     
-    data = pd.concat([Xtrain, Ytrain], axis=1)
-    f = open("test.txt", "w")
-    f.write(str(data.sort_values(by='sepal length (cm)')))
     class_0_probs, class_1_probs = get_feature_probs(data=data,Xtrain=Xtrain, attributes=attributes, bins=bins)
-    #print(class_1_probs)
-    prob_features_given_class(class_0_probs)
+    prob_dict["c0_features"] = class_0_probs
+    prob_dict["c1_features"] = class_1_probs
+    
+    
+    return prob_dict
+
+    
     

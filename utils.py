@@ -50,13 +50,17 @@ def discretize(df: pd.DataFrame, bins: int) -> pd.DataFrame:
     Returns:
         pd.DataFrame: the discretized data frame
     """
+    
     for feature in df.columns:
         if feature == "target":
             continue
         edges = np.histogram_bin_edges(df[feature], bins)
         means = {i: (edges[i] + edges[i + 1]) / 2 for i in range(len(edges) - 1)}
+        
         indexes = np.digitize(df[feature], edges[1:-1])
+        
         new_values = [means[i] for i in indexes]
+        
         df[feature] = new_values
-
+    #print(df.sort_values(by=["sepal width (cm)"]))
     return df
