@@ -21,6 +21,7 @@ if __name__ == "__main__":
     bins = [5, 10, 15, 20]
     accuracies = np.zeros(shape=(4, 5), dtype=float)
     F1_scores = np.zeros(shape=(4, 5), dtype=float)
+    ROC_scores = np.zeros(shape=(4, 5), dtype=tuple)
 
     states = [random.randint(10, 100) for __ in range(5)]
     ######################################
@@ -47,7 +48,9 @@ if __name__ == "__main__":
             )
             accuracies[i, j] = analysis.accuracy(Ytest, Ypred)
             F1_scores[i, j] = analysis.F1(Ytest, Ypred)
+            ROC_scores[i, j] = analysis.ROC(Ytest, Ypred)
 
     analysis.print_accuracy(accuracies, bins=bins)
     analysis.accuracy_plot(accuracies=accuracies, model="ID3")
     analysis.F1_plot(F1_scores=F1_scores, model="ID3")
+    analysis.ROC_plot(ROC_scores=ROC_scores, model="ID3")

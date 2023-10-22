@@ -19,10 +19,10 @@ def confusion_matrix(
     Returns:
         Tuple[float, float, float, float]: TP, FP, FN, TN
     """
-    TP = ((y_true == 1) & (y_pred == 1)).sum()
-    FP = ((y_true == 0) & (y_pred == 1)).sum()
-    FN = ((y_true == 1) & (y_pred == 0)).sum()
-    TN = ((y_true == 0) & (y_pred == 0)).sum()
+    TP = ((y_true == 1) & (y_pred == 1)).sum() / (y_true == 1).sum()
+    FP = ((y_true == 0) & (y_pred == 1)).sum() / (y_true == 1).sum()
+    FN = ((y_true == 1) & (y_pred == 0)).sum() / (y_true == 1).sum()
+    TN = ((y_true == 0) & (y_pred == 0)).sum() / (y_true == 1).sum()
 
     return TP, FP, FN, TN
 
@@ -38,7 +38,7 @@ def accuracy(y_true: pd.Series, y_pred: pd.Series) -> float:
         float: accuracy [0-100]
     """
     TP, FP, FN, TN = confusion_matrix(y_true, y_pred)
-    return TP + TN / len(y_true) * 100
+    return TP + TN / (TP + FP + FN + TN) * 100
 
 
 def print_accuracy(accuracies: np.ndarray, bins: List[int]) -> None:
@@ -129,34 +129,11 @@ def F1_plot(F1_scores: np.ndarray, model: str) -> None:
         model (str): name of the model being analyzed
     """
     bins = [5, 10, 15, 20]
-    trace1 = go.Scatter(
-        x=bins,
-        y=F1_scores[:, 0],
-        mode="lines",
-        name="split 1",
-        line=dict(dash="longdashdot"),
-    )
-    trace2 = go.Scatter(
-        x=bins, y=F1_scores[:, 1], mode="lines", name="split 2", line=dict(dash="dash")
-    )
-    trace3 = go.Scatter(
-        x=bins, y=F1_scores[:, 2], mode="lines", name="split 3", line=dict(dash="dot")
-    )
-    trace4 = go.Scatter(
-        x=bins,
-        y=F1_scores[:, 3],
-        mode="lines",
-        name="split 4",
-        line=dict(dash="dashdot"),
-    )
-    trace5 = go.Scatter(
-        x=bins,
-        y=F1_scores[:, 4],
-        mode="lines",
-        name="split 5",
-        line=dict(dash="longdash"),
-    )
-    traces = [trace1, trace2, trace3, trace4, trace5]
+    traces = []
+    for i in range(5):
+        traces.append(
+            go.Scatter(x=bins, y=F1_scores[:, i], mode="lines", name=f"split {i+1}")
+        )
 
     layout = go.Layout(
         title=f"F1 against bin size for {model}",
@@ -169,5 +146,51 @@ def F1_plot(F1_scores: np.ndarray, model: str) -> None:
     pass
 
 
-def ROC_plot(y_true: pd.Series, y_prob: pd.Series, model: str) -> None:
+def ROC(y_true: pd.Series, y_pred: pd.Series) -> Tuple[float, float]:
+    """ROC point
+
+    Args:
+        y_true (pd.Series): true values
+        y_pred (pd.Series): predicted values
+
+    Returns:
+        Tuple[float, float]: TPR, FPR
+    """
+
+    TP, FP, FN, TN = confusion_matrix(y_true, y_pred)
+    TPR = TP / (TP + FN)
+    FPR = FP / (FP + TN)
+    return FPR, TPR
+
+
+def ROC_plot(ROC_scores: np.ndarray, model: str) -> None:
+    symbols = ["circle", "square", "diamond", "cross", "triangle-up"]
+    labels = ["all neg", "5 bins", "10 bins", "15 bins", "20 bins", "all pos"]
+    colors = ["black", "red", "blue", "green", "orange", "black"]
+    traces = []
+
+    for i in range(5):
+        data = np.array([(0, 0), *ROC_scores[:, i], (1, 1)])
+        traces.append(
+            go.Scatter(
+                x=data[:, 0],
+                y=data[:, 1],
+                mode="markers",
+                marker=dict(
+                    size=10,  # Adjust the size of markers
+                    symbol=symbols[i],  # Specify the marker type (square)
+                    color=colors,  # Color for the markers in this trace
+                ),
+                name=f"split {i+1}",
+            )
+        )
+
+    layout = go.Layout(
+        title=f"ROC curves for {model}",
+        xaxis=dict(title="FPR"),
+        yaxis=dict(title="TPR"),
+    )
+
+    fig = go.Figure(data=traces, layout=layout)
+    fig.show()
     pass
