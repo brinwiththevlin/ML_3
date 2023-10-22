@@ -21,18 +21,13 @@ if __name__ == "__main__":
     bins = [5, 10, 15, 20]
     accuracies = np.zeros(shape=(4, 5), dtype=float)
     F1_scores = np.zeros(shape=(4, 5), dtype=float)
-    print("DATASET")
-    print(iris_df.to_string())
+    ROC_scores = np.zeros(shape=(4, 5), dtype=tuple)
+
     states = [random.randint(10, 100) for __ in range(5)]
     ######################################
     # ------------ binning  ------------ #
     ######################################
-    binned_data = []
-    
-    for bin in bins:
-        test = discretize(iris_df, bin)
-        binned_data.append(test )
-    #binned_data = [for bin in bins]
+    binned_data = [discretize(iris_df.copy(), bin) for bin in bins]
 
     ######################################
     # ---------- ID3 training ---------- #
@@ -52,7 +47,7 @@ if __name__ == "__main__":
     f1 = analysis.F1(y_pred=Ypred, y_true=Ytest)
     print(f1)
     
-    
+'''
     for i, data in enumerate(binned_data):
     
         for j in range(5):
@@ -65,17 +60,14 @@ if __name__ == "__main__":
            
 
             model = dt.id3(Xtrain, Ytrain, set(Xtrain.columns))
-            Ypred = pd.Series([model.predict(x) for _, x in Xtest.iterrows()],index=Ytest.index)
-            accuracies[i,j] = analysis.accuracy(Ytest, Ypred)
-            F1_scores[i,j] = analysis.F1(Ytest, Ypred)
-            
-    analysis.accuracy_plot(accuracies=accuracies, model='ID3')
-    analysis.F1_plot(F1_scores=F1_scores, model='ID3')
-        
-            
-            
-    print(accuracies)
-    print(F1_scores)
-    '''
+            Ypred = pd.Series(
+                [model.predict(x) for _, x in Xtest.iterrows()], index=Ytest.index
+            )
+            accuracies[i, j] = analysis.accuracy(Ytest, Ypred)
+            F1_scores[i, j] = analysis.F1(Ytest, Ypred)
+            ROC_scores[i, j] = analysis.ROC(Ytest, Ypred)
 
-    print(binned_data)
+    analysis.print_accuracy(accuracies, bins=bins)
+    analysis.accuracy_plot(accuracies=accuracies, model="ID3")
+    analysis.F1_plot(F1_scores=F1_scores, model="ID3")
+    analysis.ROC_plot(ROC_scores=ROC_scores, model="ID3")
